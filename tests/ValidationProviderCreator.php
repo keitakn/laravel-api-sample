@@ -32,11 +32,11 @@ class ValidationProviderCreator
      *
      * @return array
      */
-    public static function createEmailInRequiredParams()
+    public static function emailIsRequiredParams(): array
     {
         return [
             '.から始まるメールアドレス' => [
-                '.keita-koga@gmail.com',
+                '.keita-koga@example.com',
             ],
             // 128文字以上
             '長いメールアドレス' => [
@@ -75,42 +75,11 @@ class ValidationProviderCreator
     }
 
     /**
-     * 会員登録トークン（必須パラメータの場合）
-     *
-     * @return array
-     */
-    public static function createRegisterTokenRequiredParams()
-    {
-        return [
-            'マルチバイト文字' => [
-                'q1あいうえおK',
-            ],
-            'JSON' => [
-                json_encode(
-                    ['りんご', 'ばなな', 'みかん']
-                )
-            ],
-            '長い文字列' => [
-                str_repeat('a', 65),
-            ],
-            '大きな数値' => [
-                4294967296,
-            ],
-            'ホワイトリストに含まれていない数値' => [
-                0
-            ],
-            '記号が含まれた文字列' => [
-                'a.a@',
-            ],
-        ];
-    }
-
-    /**
      * パスワード（必須パラメータの場合）
      *
      * @return array
      */
-    public static function createPasswordTokenRequiredParams()
+    public static function passwordIsRequiredParams(): array
     {
         return [
             '空文字' => [
@@ -149,490 +118,39 @@ class ValidationProviderCreator
     }
 
     /**
-     * 姓名（必須パラメータの場合）
+     * email_verified（任意パラメータ）
      *
      * @return array
      */
-    public static function createNameRequiredParams()
+    public static function emailVerifiedIsOptionalParams(): array
     {
         return [
-            '数値' => [
-                1,
-                1,
-            ],
-            '大きな文字列（氏名は100文字まで）' => [
-                str_repeat('漢', 101),
-                str_repeat('漢', 101),
-            ],
-            'NULL' => [
-                null,
-                null,
-            ],
-            '空' => [
-                '',
-                '',
-            ],
-            'スクリプト' => [
-                '<script>alert(1);</script>',
-                '<script>alert(1);</script>',
-            ],
-            '!' => [
-                '!',
-                '!',
-            ],
-            '"' => [
-                '"',
-                '"',
-            ],
-            '#' => [
-                '#',
-                '#',
-            ],
-            '$' => [
-                '$',
-                '$',
-            ],
-            '%' => [
-                '%',
-                '%',
-            ],
-            '&' => [
-                '&',
-                '&',
-            ],
-            '\'' => [
-                '\'',
-                '\'',
-            ],
-            '(' => [
-                '(',
-                '(',
-            ],
-            ')' => [
-                ')',
-                ')',
-            ],
-            '*' => [
-                '*',
-                '*',
-            ],
-            '+' => [
-                '+',
-                '+',
-            ],
-            ',' => [
-                ',',
-                ',',
-            ],
-            '-' => [
-                '-',
-                '-',
-            ],
-            '.' => [
-                '.',
-                '.',
-            ],
-            '/' => [
-                '/',
-                '/',
-            ],
-            ':' => [
-                ':',
-                ':',
-            ],
-            ';' => [
-                ';',
-                ';',
-            ],
-            '<' => [
-                '<',
-                '<',
-            ],
-            '=' => [
-                '=',
-                '=',
-            ],
-            '>' => [
-                '>',
-                '>',
-            ],
-            '?' => [
-                '?',
-                '?',
-            ],
-            '@' => [
-                '@',
-                '@',
-            ],
-            '[' => [
-                '[',
-                '[',
-            ],
-            '\n' => [
-                '\n',
-                '\n',
-            ],
-            ']' => [
-                ']',
-                ']',
-            ],
-            '^' => [
-                '^',
-                '^',
-            ],
-            '_' => [
-                '_',
-                '_',
-            ],
-            '`' => [
-                '`',
-                '`',
-            ],
-            '{' => [
-                '{',
-                '{',
-            ],
-            '}' => [
-                '}',
-                '}',
-            ],
-            '|' => [
-                '|',
-                '|',
-            ],
-            '~' => [
-                '~',
-                '~',
-            ],
-            '¥' => [
-                '¥',
-                '¥',
-            ],
-        ];
-    }
-
-    /**
-     * 姓名（ふりがな）（任意パラメータの場合）
-     *
-     * @return array
-     */
-    public static function createNameKanaOptionalParams()
-    {
-        return [
-            'Array' => [
-                // given_name_kana
-                [],
-                // family_name_kana
-                [],
-            ],
-            '大きな数値' => [
-                // given_name_kana
-                99999999999,
-                // family_name_kana
-                99999999999,
-            ],
-            '大きな文字列' => [
-                // given_name_kana
-                str_repeat('な', 101),
-                // family_name_kana
-                str_repeat('な', 101),
-            ],
-            '漢字が含まれている' => [
-                '漢字なまえ',
-                '漢字なまえ',
-            ],
-        ];
-    }
-
-    /**
-     * 性別（任意パラメータの場合）
-     *
-     * @return array
-     */
-    public static function createGenderInRequiredParams()
-    {
-        return [
-            'マルチバイト文字' => [
-                'q1あいうえおK',
-            ],
             'NULL' => [
                 null,
             ],
             'Array' => [
-                [1, 2, 3],
+                ['a' => 'a'],
             ],
             'JSON' => [
                 json_encode(
                     ['りんご', 'ばなな', 'みかん']
                 )
             ],
-            '大きな数値' => [
-                4294967296,
+            '1以外の数値' => [
+                2,
             ],
-            'ホワイトリストに含まれていない数値' => [
-                10,
-            ],
-            '記号が含まれた文字列' => [
-                'a./+*{}~¥¥¥<>?_*}{|~=---}a',
+            'マイナス数値' => [
+                -1
             ],
         ];
     }
 
     /**
-     * 国コード（必須パラメータの場合）
+     * ユーザーID（sub）（必須パラメータ）
      *
      * @return array
      */
-    public static function createCountryInRequiredParams()
-    {
-        return [
-            'マルチバイト文字' => [
-                'q1あいうえおK',
-            ],
-            'NULL' => [
-                null,
-            ],
-            'Array' => [
-                [1, 2, 3],
-            ],
-            'JSON' => [
-                json_encode(
-                    ['りんご', 'ばなな', 'みかん']
-                )
-            ],
-            '大きな数値' => [
-                4294967296,
-            ],
-            'ホワイトリストに含まれていない数値' => [
-                10,
-            ],
-            '記号が含まれた文字列' => [
-                'a./+*{}~¥¥¥<>?_*}{|~=---}a',
-            ],
-            '2桁の国コード' => [
-                'JP'
-            ],
-        ];
-    }
-
-    /**
-     * regionのバリデーション
-     *
-     * @return array
-     */
-    public static function createRegionInRequiredParams()
-    {
-        return [
-            '空文字' => [
-                '',
-            ],
-            'マルチバイト文字' => [
-                'q1あいうえおK',
-            ],
-            'NULL' => [
-                null,
-            ],
-            'Array' => [
-                [1, 2, 3],
-            ],
-            'JSON' => [
-                json_encode(
-                    ['りんご', 'ばなな', 'みかん']
-                )
-            ],
-            '大きな数値' => [
-                4294967296,
-            ],
-            '記号が含まれた文字列' => [
-                'a./+*{}~¥¥¥<>?_*}{|~=---}a',
-            ],
-            '登録されていないコード' => [
-                48
-            ],
-        ];
-    }
-
-    /**
-     * 職業コード（任意パラメータの場合）
-     *
-     * @return array
-     */
-    public static function createOccupationCodeInOptionalParams()
-    {
-        return [
-            'マルチバイト文字' => [
-                'q1あいうえおK',
-            ],
-            'NULL' => [
-                null,
-            ],
-            'Array' => [
-                [1, 2, 3],
-            ],
-            'JSON' => [
-                json_encode(
-                    ['りんご', 'ばなな', 'みかん']
-                )
-            ],
-            '長い文字列' => [
-                str_repeat('S', 256),
-            ],
-            '大きな数値' => [
-                4294967296,
-            ],
-            'ホワイトリストに含まれていない数値' => [
-                0
-            ],
-            '記号が含まれた文字列' => [
-                'a./+*{}~¥¥¥<>?_*}{|~=---}a',
-            ],
-        ];
-    }
-
-    /**
-     * 職業コード（必須パラメータの場合）
-     *
-     * @return array
-     */
-    public static function createOccupationCodeInRequiredParams()
-    {
-        return [
-            '空文字' => [
-                '',
-            ],
-            'マルチバイト文字' => [
-                'q1あいうえおK',
-            ],
-            'NULL' => [
-                null,
-            ],
-            'Array' => [
-                [1, 2, 3],
-            ],
-            'JSON' => [
-                json_encode(
-                    ['りんご', 'ばなな', 'みかん']
-                )
-            ],
-            '長い文字列' => [
-                str_repeat('S', 256),
-            ],
-            '大きな数値' => [
-                4294967296,
-            ],
-            'ホワイトリストに含まれていない数値' => [
-                0
-            ],
-            '記号が含まれた文字列' => [
-                'a./+*{}~¥¥¥<>?_*}{|~=---}a',
-            ],
-        ];
-    }
-
-    /**
-     * 卒業年（任意パラメータ）
-     *
-     * @return array
-     */
-    public function createGraduationYearInOptionalParams()
-    {
-        return [
-            '空文字' => [
-                '',
-            ],
-            'マルチバイト文字' => [
-                'q1あいうえおK',
-            ],
-            'NULL' => [
-                null,
-            ],
-            'JSON' => [
-                json_encode(
-                    ['りんご', 'ばなな', 'みかん']
-                )
-            ],
-            '長い文字列' => [
-                str_repeat('S', 256),
-            ],
-            '大きな数値' => [
-                4294967296,
-            ],
-            'ホワイトリストに含まれていない数値' => [
-                0
-            ],
-            '記号が含まれた文字列' => [
-                'a./+*{}~¥¥¥<>?_*}{|~=---}a',
-            ],
-            '5桁の数字' => [
-                20001
-            ],
-            'マイナスの数値' => [
-                -1111
-            ],
-        ];
-    }
-
-    /**
-     * 誕生日（任意パラメータ）
-     *
-     * @return array
-     */
-    public static function createBirthdateInOptionalParams()
-    {
-        return [
-            'NULL' => [
-                null,
-            ],
-            '指定外のフォーマット' => [
-                '2015/01/01',
-            ],
-            '日時形式のフォーマット' => [
-                // birthdate
-                '2015-01-01 00:00:00',
-            ],
-        ];
-    }
-
-    /**
-     * is_login_auto（任意パラメータ）
-     *
-     * @return array
-     */
-    public static function createIsLoginAutoInOptionalParams()
-    {
-        return [
-            'マルチバイト文字' => [
-                'q1あいうえおK',
-            ],
-            'NULL' => [
-                null,
-            ],
-            'Array' => [
-                [1, 2, 3],
-            ],
-            'JSON' => [
-                json_encode(
-                    ['りんご', 'ばなな', 'みかん']
-                )
-            ],
-            '長い文字列' => [
-                str_repeat('S', 256),
-            ],
-            '0, 1以外の数値' => [
-                2
-            ],
-            '記号が含まれた文字列' => [
-                'a./+*{}~¥¥¥<>?_*}{|~=---}a',
-            ],
-        ];
-    }
-
-    /**
-     * ユーザーID（必須パラメータ）
-     *
-     * @return array
-     */
-    public static function createSubInRequiredParams()
+    public static function subIsRequiredParams(): array
     {
         return [
             'マルチバイト文字' => [
@@ -655,82 +173,6 @@ class ValidationProviderCreator
             ],
             '負の数' => [
                 -1
-            ],
-        ];
-    }
-
-    /**
-     * 認証メールアドレス（必須パラメータ）
-     *
-     * @return array
-     */
-    public static function createAuthenticationEmailInRequiredParams()
-    {
-        return [
-            '空文字' => [
-                '',
-            ],
-            'NULL' => [
-                null,
-            ],
-            'マルチバイト文字' => [
-                'あいうえお',
-            ],
-            '記号' => [
-                '.+*{}~¥¥¥<>?_*}{|~=---}',
-            ],
-            '129文字以上のメールアドレス' => [
-                str_repeat('@', 129),
-            ],
-        ];
-    }
-
-    /**
-     * 認証パスワード（必須パラメータ）
-     *
-     * @return array
-     */
-    public static function createAuthenticationPasswordInRequiredParams()
-    {
-        return [
-            '空文字' => [
-                '',
-            ],
-            'NULL' => [
-                null,
-            ],
-            'マルチバイト文字' => [
-                'あいうえお',
-            ],
-            '記号' => [
-                '.+*{}~¥¥¥<>?_*}{|~=---}',
-            ],
-            '3桁以下のパスワード' => [
-                'pas',
-            ],
-        ];
-    }
-
-    /**
-     * メールアドレス検証トークン（必須パラメータ）
-     *
-     * @return array
-     */
-    public static function createEmailVerifyTokenInRequiredParams()
-    {
-        return [
-            'マルチバイト文字' => [
-                'あいうえお',
-            ],
-            '記号' => [
-                '{@@@}',
-            ],
-            'bigInt' => [
-                99999999999,
-                99999999999,
-            ],
-            '大きな文字列' => [
-                str_repeat('q', 65),
             ],
         ];
     }

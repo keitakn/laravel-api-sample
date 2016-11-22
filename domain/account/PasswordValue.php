@@ -51,13 +51,13 @@ class PasswordValue
     /**
      * PasswordValue constructor.
      *
-     * @param int $password
+     * @param string $password
      * @param string $passwordHash
      * @param int $lockVersion
      * @param int $id
      */
     public function __construct(
-        int $password = '',
+        string $password = '',
         string $passwordHash = '',
         int $lockVersion = 0,
         int $id = 0

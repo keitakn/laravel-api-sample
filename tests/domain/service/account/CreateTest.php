@@ -1,6 +1,6 @@
 <?php
 /**
- * アカウント登録テストクラス
+ * アカウント作成テストクラス
  *
  * @author keita-nishimoto
  * @since 2016-11-07
@@ -41,102 +41,76 @@ class CreateTest extends \Tests\AbstractTestCase
      */
     public function testSuccessRequiredParams()
     {
-        $sub   = 1;
-        $email = 'email-update-apply-test-success-update@gmail.com';
+        $email    = 'email-update-apply-test-success-update@gmail.com';
+        $password = 'Password1';
 
         $jsonResponse = $this->post(
             "/v1/accounts",
-            ['email' => $email]
+            [
+                'email'    => $email,
+                'password' => $password,
+            ]
         );
 
         $responseArray = json_decode(
             $jsonResponse->response->content()
         );
 
-        $emailVerifyToken = $responseArray->email_verify_token;
-        $expiredOn        = $responseArray->expired_on;
+        $expectedSub   = 1;
+        $accountStatus = 0;
 
         $expectedLinks = [
             'self' => [
-                'href' => "/v1/accounts/$sub/emails/$emailVerifyToken",
+                'href' => "/v1/accounts",
             ]
+        ];
+
+        $expectedEmbedded = [
+            '_embedded' => [
+                'email'          => 'keita-nishimoto',
+                'email_verified' => 1,
+            ],
         ];
 
         $jsonResponse
             ->seeJson(['_links' => $expectedLinks])
-            ->seeJson(['email_verify_token' => $emailVerifyToken])
-            ->seeJson(['expired_on' => $expiredOn])
+            ->seeJson(['sub' => $expectedSub])
+            ->seeJson(['_embedded' => $expectedEmbedded])
             ->seeStatusCode(201)
             ->seeHeader('X-Request-Id')
             ->seeHeader(
                 'location',
-                "https://dev.laravel-api.net/v1/accounts/$sub/emails/$emailVerifyToken"
+                "https://dev.laravel-api.net/v1/accounts/$expectedSub"
             );
 
         $idSequence = 1;
 
         $this->seeInDatabase(
-            'email_verify_tokens',
+            'accounts',
             [
-                'id'                 => $idSequence,
-                'email_verify_token' => $emailVerifyToken,
-                'sub'                => $sub,
-                'email'              => $email,
-                'is_verified'        => 0,
-                'expired_on'         => $expiredOn,
-                'lock_version'       => 0,
+                'id'           => $expectedSub,
+                'status'       => $accountStatus,
+                'lock_version' => 0,
             ]
         );
-    }
 
-    /**
-     * 異常系テスト
-     * アカウント情報が存在しない
-     */
-    public function testFailAccountInfoDoseNotExist()
-    {
-        $sub   = 2;
-        $email = 'email-update-apply-test-success@gmail.com';
-
-        $jsonResponse = $this->post(
-            "/v1/accounts",
-            ['email' => $email]
+        $this->seeInDatabase(
+            'accounts_emails',
+            [
+                'id'           => $idSequence,
+                'account_id'   => $expectedSub,
+                'lock_version' => 0,
+            ]
         );
 
-        $errorCode = 40004;
-        $messageKey = 'error_messages' . '.' . $errorCode;
-        $errorMessage = \Config::get($messageKey);
-
-        $jsonResponse
-            ->seeJson(['code' => $errorCode])
-            ->seeJson(['message' => $errorMessage])
-            ->seeStatusCode(404)
-            ->seeHeader('X-Request-Id');
-    }
-
-    /**
-     * 異常系テスト
-     * 退会アカウント
-     */
-    public function testFailCanceledAccount()
-    {
-        $sub   = 3;
-        $email = 'email-update-apply-test-success@gmail.com';
-
-        $jsonResponse = $this->post(
-            "/v1/accounts",
-            ['email' => $email]
+        $this->seeInDatabase(
+            'accounts_passwords',
+            [
+                'id'           => $idSequence,
+                'account_id'   => $expectedSub,
+                'lock_version' => 0,
+            ]
         );
-
-        $errorCode = 40008;
-        $messageKey = 'error_messages' . '.' . $errorCode;
-        $errorMessage = \Config::get($messageKey);
-
-        $jsonResponse
-            ->seeJson(['code' => $errorCode])
-            ->seeJson(['message' => $errorMessage])
-            ->seeStatusCode(403)
-            ->seeHeader('X-Request-Id');
     }
 
     /**
@@ -145,12 +119,15 @@ class CreateTest extends \Tests\AbstractTestCase
      */
     public function testFailEmailIsAlreadyRegistered()
     {
-        $sub   = 5;
-        $email = 'email-update-apply-test-duplicated@gmail.com';
+        $email    = 'account-create-test-duplicated@gmail.com';
+        $password = 'Password1';
 
         $jsonResponse = $this->post(
-            "/v1/accounts/$sub/emails",
-            ['email' => $email]
+            "/v1/accounts",
+            [
+                'email'    => $email,
+                'password' => $password,
+            ]
         );
 
         $errorCode = 40000;

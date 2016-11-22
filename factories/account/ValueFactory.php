@@ -42,7 +42,7 @@ class ValueFactory
             }
         }
 
-        $emailId = null;
+        $emailId = 0;
         if (array_key_exists('id', $params) === true) {
             if (is_int($params['id']) === true && $params['id'] > 0) {
                 $emailId = $params['id'];
@@ -67,11 +67,10 @@ class ValueFactory
      */
     public static function createPasswordValue($params)
     {
-        $password     = null;
-        $passwordHash = null;
-        $passwordType = 0;
+        $password     = '';
+        $passwordHash = '';
         $lockVersion  = 0;
-        $passwordId   = null;
+        $passwordId   = 0;
 
         if (array_key_exists('password', $params) === true) {
             $password = $params['password'];
@@ -79,12 +78,6 @@ class ValueFactory
 
         if (array_key_exists('passwordHash', $params) === true) {
             $passwordHash = $params['passwordHash'];
-        }
-
-        if (array_key_exists('passwordType', $params) === true) {
-            if (is_int($params['passwordType']) === true) {
-                $passwordType = $params['passwordType'];
-            }
         }
 
         if (array_key_exists('lockVersion', $params) === true) {
@@ -102,7 +95,6 @@ class ValueFactory
         $passwordValue = new PasswordValue(
             $password,
             $passwordHash,
-            $passwordType,
             $lockVersion,
             $passwordId
         );

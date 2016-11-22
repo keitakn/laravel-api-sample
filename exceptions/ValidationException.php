@@ -23,7 +23,7 @@ class ValidationException extends DomainException
     /**
      * バリデーションエラー時のエラーコード
      */
-    const VALIDATION_ERROR_CODE = 11000;
+    const VALIDATION_ERROR_CODE = 422;
 
     /**
      * バリデーションエラー詳細

@@ -100,7 +100,7 @@ class EmailValue
      *
      * @return bool
      */
-    public function isEmailVerified()
+    public function isEmailVerified(): bool
     {
         return (bool)$this->getEmailVerified();
     }
@@ -145,9 +145,9 @@ class EmailValue
 
     /**
      * @param int $id
-     * @return $this
+     * @return EmailValue
      */
-    private function setId(int $id)
+    private function setId(int $id): self
     {
         $this->id = $id;
 

@@ -8,15 +8,17 @@
  * @link https://readouble.com/laravel/5.3/ja/controllers.html
  */
 
+// App\Http\Controllers\V1\AccountController
+
 namespace App\Http\Controllers\V1;
 
 use Illuminate\Http\Request;
-
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Domain;
 
 /**
- * Class AccountController
+ * Class AccountsController
  *
  * @category laravel-api-sample
  * @package App\Http\Controllers\V1
@@ -24,7 +26,7 @@ use App\Http\Controllers\Controller;
  * @since 2016-09-06
  * @link https://github.com/keita-nishimoto/laravel-api-sample
  */
-class AccountController extends Controller
+class AccountsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -45,7 +47,7 @@ class AccountController extends Controller
      * Show the form for creating a new resource.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function create(Request $request)
     {
@@ -58,13 +60,25 @@ class AccountController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * アカウント作成
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
+        $serviceFacade = new Domain\ServiceFacade(
+            $request,
+            'Account',
+            'create'
+        );
+        $responseEntity = $serviceFacade->execute();
+
+        return response()->json(
+            $responseEntity->getBody(),
+            $responseEntity->getHttpStatusCode(),
+            $responseEntity->getHeader()
+        );
     }
 
     /**

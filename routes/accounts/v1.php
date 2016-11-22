@@ -15,7 +15,7 @@
  */
 Route::post(
     'accounts/{sub}',
-    'V1\AccountController@show'
+    'V1\AccountsController@show'
 );
 
 /**
@@ -25,5 +25,5 @@ Route::post(
  */
 Route::post(
     'accounts',
-    'V1\AccountController@store'
+    'V1\AccountsController@store'
 );

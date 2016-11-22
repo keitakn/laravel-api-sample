@@ -81,7 +81,7 @@ class AccountRepository implements AccountRepositoryInterface
      * @return AccountEntity
      * @throws DomainException
      */
-    public function saveEmail(AccountEntity $accountEntity)
+    public function saveEmail(AccountEntity $accountEntity): AccountEntity
     {
         $emailValue = $accountEntity->getEmailValue();
 
@@ -139,13 +139,12 @@ class AccountRepository implements AccountRepositoryInterface
             [
                 'password'     => $passwordValue->getPassword(),
                 'passwordHash' => $passwordValue->getPasswordHash(),
-                'passwordType' => $passwordValue->getPasswordType(),
                 'lockVersion'  => 0,
                 'id'           => (int)$passwordId,
             ]
         );
 
-        $accountEntity->setAuthenticationPassword($newPasswordValue);
+        $accountEntity->setPasswordValue($newPasswordValue);
 
         return $accountEntity;
     }

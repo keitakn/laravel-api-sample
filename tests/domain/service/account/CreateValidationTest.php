@@ -1,6 +1,6 @@
 <?php
 /**
- * アカウント登録バリデーションテストクラス
+ * アカウント作成バリデーションテストクラス
  *
  * @author keita-nishimoto
  * @since 2016-11-17
@@ -13,7 +13,7 @@ use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Tests\ValidationProviderCreator;
 
 /**
- * Class EmailUpdateApplyValidationTest
+ * Class CreateValidationTest
  *
  * @category laravel-api-sample
  * @package Tests\Domain\Service\Account
@@ -26,20 +26,24 @@ class CreateValidationTest extends \Tests\AbstractTestCase
     use WithoutMiddleware;
 
     /**
-     * 必須パラメータのバリデーションエラー
+     * 全パラメータのバリデーションエラー
      *
-     * @dataProvider requiredParamsProvider
-     * @param $sub
      * @param $email
+     * @param $emailVerified
+     * @param $password
      */
-    public function testRequiredParams($sub, $email)
+    public function testAllParams($email, $emailVerified, $password)
     {
         $jsonResponse = $this->post(
-            "/v1/accounts/$sub/emails",
-            ['email' => $email]
+            "/v1/accounts",
+            [
+                'email'          => $email,
+                'password'       => $password,
+                'email_verified' => $emailVerified,
+            ]
         );
 
-        $errorCode = 11000;
+        $errorCode = 422;
         $messageKey = 'error_messages' . '.' . $errorCode;
         $errorMessage = \Config::get($messageKey);
 
@@ -53,8 +57,8 @@ class CreateValidationTest extends \Tests\AbstractTestCase
             $jsonResponse->response->content()
         );
 
-        $this->assertObjectHasAttribute('sub', $responseStdObject->errors);
         $this->assertObjectHasAttribute('email', $responseStdObject->errors);
+        $this->assertObjectHasAttribute('email_verified', $responseStdObject->errors);
     }
 
     /**
@@ -64,15 +68,14 @@ class CreateValidationTest extends \Tests\AbstractTestCase
      */
     public function requiredParamsProvider()
     {
-        // ユーザーID、メールアドレスの順番
         return [
-            'failParamIsMultiByteChars' => [
+            'マルチバイト文字' => [
                 'あいうえお',
                 'あいうえお',
             ],
             '記号と.から始まるメールアドレス' => [
-                'id-000',
-                '.keita-koga@gmail.com',
+                '.keita-aaa@gmail.com',
+                2,
             ],
             '半角英数とJSON' => [
                 'abc123',
@@ -80,56 +83,15 @@ class CreateValidationTest extends \Tests\AbstractTestCase
                     ['りんご', 'ばなな', 'みかん']
                 ),
             ],
-            'bigInt' => [
+            '大きな数字' => [
                 -9999999999,
                 99999999999,
             ],
-            'longString' => [
+            '大きな文字列' => [
                 str_repeat('q', 65),
                 str_repeat('k@', 129),
             ],
         ];
-    }
-
-    /**
-     * ユーザーIDのバリデーションエラー
-     *
-     * @dataProvider subProvider
-     * @param $sub
-     */
-    public function testSub($sub)
-    {
-        $jsonResponse = $this->post(
-            "/v1/accounts/$sub/emails",
-            ['email' => 'keita-koga@gmail.com']
-        );
-
-        $errorCode = 11000;
-        $messageKey = 'error_messages' . '.' . $errorCode;
-        $errorMessage = \Config::get($messageKey);
-
-        $jsonResponse
-            ->seeJson(['code' => $errorCode])
-            ->seeJson(['message' => $errorMessage])
-            ->seeStatusCode(422)
-            ->seeHeader('X-Request-Id');
-
-        $responseStdObject = json_decode(
-            $jsonResponse->response->content()
-        );
-
-        $this->assertObjectHasAttribute('sub', $responseStdObject->errors);
-        $this->assertObjectNotHasAttribute('email', $responseStdObject->errors);
-    }
-
-    /**
-     * ユーザーIDのデータプロバイダ
-     *
-     * @return array
-     */
-    public function subProvider()
-    {
-        return ValidationProviderCreator::createSubInRequiredParams();
     }
 
     /**
@@ -145,7 +107,7 @@ class CreateValidationTest extends \Tests\AbstractTestCase
             ['email' => $email]
         );
 
-        $errorCode = 11000;
+        $errorCode = 422;
         $messageKey = 'error_messages' . '.' . $errorCode;
         $errorMessage = \Config::get($messageKey);
 
@@ -159,8 +121,9 @@ class CreateValidationTest extends \Tests\AbstractTestCase
             $jsonResponse->response->content()
         );
 
-        $this->assertObjectNotHasAttribute('sub', $responseStdObject->errors);
         $this->assertObjectHasAttribute('email', $responseStdObject->errors);
+        $this->assertObjectNotHasAttribute('password', $responseStdObject->errors);
+        $this->assertObjectNotHasAttribute('email_verified', $responseStdObject->errors);
     }
 
     /**
@@ -170,6 +133,101 @@ class CreateValidationTest extends \Tests\AbstractTestCase
      */
     public function emailProvider()
     {
-        return ValidationProviderCreator::createEmailInRequiredParams();
+        return ValidationProviderCreator::emailIsRequiredParams();
+    }
+
+    /**
+     * パスワードのバリデーションエラー
+     *
+     * @param $password
+     */
+    public function testPassword($password)
+    {
+        $email = 'k-keita@example.com';
+
+        $jsonResponse = $this->post(
+            "/v1/accounts",
+            [
+                'email'    => $email,
+                'password' => $password,
+            ]
+        );
+
+        $errorCode = 422;
+        $messageKey = 'error_messages' . '.' . $errorCode;
+        $errorMessage = \Config::get($messageKey);
+
+        $jsonResponse
+            ->seeJson(['code' => $errorCode])
+            ->seeJson(['message' => $errorMessage])
+            ->seeStatusCode(422)
+            ->seeHeader('X-Request-Id');
+
+        $responseStdObject = json_decode(
+            $jsonResponse->response->content()
+        );
+
+        $this->assertObjectNotHasAttribute('email', $responseStdObject->errors);
+        $this->assertObjectHasAttribute('password', $responseStdObject->errors);
+        $this->assertObjectNotHasAttribute('email_verified', $responseStdObject->errors);
+    }
+
+    /**
+     * パスワードのデータプロバイダ
+     *
+     * @return array
+     */
+    public function passwordProvider()
+    {
+        return ValidationProviderCreator::passwordIsRequiredParams();
+    }
+
+    /**
+     * email_verifiedのバリデーションエラー
+     *
+     * @param $emailVerified
+     */
+    public function testEmailVerified($emailVerified)
+    {
+        $email         = 'k-keita@example.com';
+        $password      = 'Password1';
+        $emailVerified = 1;
+
+        $jsonResponse = $this->post(
+            "/v1/accounts",
+            [
+                'email'          => $email,
+                'password'       => $password,
+                'email_verified' => $emailVerified,
+            ]
+        );
+
+        $errorCode = 422;
+        $messageKey = 'error_messages' . '.' . $errorCode;
+        $errorMessage = \Config::get($messageKey);
+
+        $jsonResponse
+            ->seeJson(['code' => $errorCode])
+            ->seeJson(['message' => $errorMessage])
+            ->seeStatusCode(422)
+            ->seeHeader('X-Request-Id');
+
+        $responseStdObject = json_decode(
+            $jsonResponse->response->content()
+        );
+
+        $this->assertObjectNotHasAttribute('email', $responseStdObject->errors);
+        $this->assertObjectHasAttribute('password', $responseStdObject->errors);
+        $this->assertObjectNotHasAttribute('email_verified', $responseStdObject->errors);
+    }
+
+    /**
+     * email_verifiedのデータプロバイダ
+     *
+     * @return array
+     */
+    public function emailVerifiedProvider()
+    {
+        return ValidationProviderCreator::passwordIsRequiredParams();
     }
 }
