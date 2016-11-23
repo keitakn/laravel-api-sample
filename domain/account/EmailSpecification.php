@@ -33,7 +33,7 @@ class EmailSpecification
         $accountRepository = AccountRepository::getInstance();
         $accountEntity = $accountRepository->findAccountEntityByEmail($emailValue);
 
-        if ($accountEntity instanceof AccountEntity) {
+        if ($accountEntity->isEmpty() === false) {
             return false;
         }
 

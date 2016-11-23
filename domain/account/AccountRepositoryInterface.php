@@ -28,12 +28,12 @@ interface AccountRepositoryInterface
     public static function getInstance();
 
     /**
-     * アカウントEntityを保存する
+     * アカウントEntityを新規で作成し保存する
      *
-     * @param AccountEntity $accountEntity
+     * @param array $params
      * @return AccountEntity
      */
-    public function saveAccountEntity(AccountEntity $accountEntity): AccountEntity;
+    public function createAccountEntity(array $params): AccountEntity;
 
     /**
      * メールアドレスオブジェクトを保存する

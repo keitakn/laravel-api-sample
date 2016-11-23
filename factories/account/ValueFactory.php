@@ -27,10 +27,10 @@ class ValueFactory
     /**
      * メールアドレスオブジェクトを生成する
      *
-     * @param $params
+     * @param array $params
      * @return EmailValue
      */
-    public static function createEmailValue($params)
+    public static function createEmailValue(array $params): EmailValue
     {
         $email         = $params['email'];
         $emailVerified = $params['emailVerified'];
@@ -60,12 +60,22 @@ class ValueFactory
     }
 
     /**
+     * 空のメールアドレスオブジェクトを生成する
+     *
+     * @return EmailValue
+     */
+    public static function createEmptyEmailValue(): EmailValue
+    {
+        return new EmailValue();
+    }
+
+    /**
      * パスワードオブジェクトを生成する
      *
      * @param $params
      * @return PasswordValue
      */
-    public static function createPasswordValue($params)
+    public static function createPasswordValue(array $params): PasswordValue
     {
         $password     = '';
         $passwordHash = '';
@@ -100,5 +110,15 @@ class ValueFactory
         );
 
         return $passwordValue;
+    }
+
+    /**
+     * パスワードオブジェクトを生成する
+     *
+     * @return PasswordValue
+     */
+    public static function createEmptyPasswordValue(): PasswordValue
+    {
+        return new PasswordValue();
     }
 }

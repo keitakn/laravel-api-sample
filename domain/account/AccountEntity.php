@@ -9,6 +9,8 @@
 
 namespace Domain\Account;
 
+use Domain\EntityInterface;
+use Factories\Account\ValueFactory;
 use Repositories\Mysql\AccountRepository;
 
 /**
@@ -20,7 +22,7 @@ use Repositories\Mysql\AccountRepository;
  * @since 2016-10-06
  * @link https://github.com/keita-nishimoto/laravel-api-sample
  */
-class AccountEntity
+class AccountEntity implements EntityInterface
 {
     /**
      * ユーザーID
@@ -44,11 +46,11 @@ class AccountEntity
     private $emailValue;
 
     /**
-     * パスワード PasswordValue
+     * パスワード ValueObject
      *
-     * @var PasswordValue[]
+     * @var PasswordValue
      */
-    private $passwordValues;
+    private $passwordValue;
 
     /**
      * ロックバージョン
@@ -66,7 +68,25 @@ class AccountEntity
     {
         // ユビキタス言語的にはアカウントIDをsubと呼ぶ
         // 命名はOpenIDConnect 5.1. Standard Claimsより
-        $this->setSub($sub);
+        $this->setSub($sub)
+            ->setAccountStatus(0)
+            ->setEmailValue(ValueFactory::createEmptyEmailValue())
+            ->setPasswordValue(ValueFactory::createEmptyPasswordValue())
+            ->setLockVersion(0);
+    }
+
+    /**
+     * 自身が空のEntityか判定する
+     *
+     * @return bool
+     */
+    public function isEmpty(): bool
+    {
+        if ($this->getSub() === 0) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -131,16 +151,16 @@ class AccountEntity
      */
     public function getPasswordValue(): PasswordValue
     {
-        return $this->passwordValues;
+        return $this->passwordValue;
     }
 
     /**
-     * @param PasswordValue $passwordValues
+     * @param PasswordValue $passwordValue
      * @return AccountEntity
      */
-    public function setPasswordValue(PasswordValue $passwordValues): self
+    public function setPasswordValue(PasswordValue $passwordValue): self
     {
-        $this->passwordValues = $passwordValues;
+        $this->passwordValue = $passwordValue;
 
         return $this;
     }
@@ -198,19 +218,6 @@ class AccountEntity
         }
 
         return false;
-    }
-
-    /**
-     * 自身をDBに登録する
-     *
-     * @return AccountEntity
-     */
-    public function save(): self
-    {
-        $accountRepository = AccountRepository::getInstance();
-        $accountRepository->saveAccountEntity($this);
-
-        return $this;
     }
 
     /**

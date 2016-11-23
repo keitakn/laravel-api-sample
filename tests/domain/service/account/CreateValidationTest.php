@@ -28,6 +28,7 @@ class CreateValidationTest extends \Tests\AbstractTestCase
     /**
      * 全パラメータのバリデーションエラー
      *
+     * @dataProvider allParamsProvider
      * @param $email
      * @param $emailVerified
      * @param $password
@@ -62,23 +63,30 @@ class CreateValidationTest extends \Tests\AbstractTestCase
     }
 
     /**
-     * 必須パラメータ用のデータプロバイダー
+     * 全パラメータ用のデータプロバイダー
      *
      * @return array
      */
-    public function requiredParamsProvider()
+    public function allParamsProvider()
     {
         return [
             'マルチバイト文字' => [
                 'あいうえお',
                 'あいうえお',
+                'あいうえお',
             ],
-            '記号と.から始まるメールアドレス' => [
-                '.keita-aaa@gmail.com',
-                2,
+            '記号だけ' => [
+                '@@@',
+                '+++',
+                '---',
             ],
-            '半角英数とJSON' => [
-                'abc123',
+            'JSON' => [
+                json_encode(
+                    ['りんご', 'ばなな', 'みかん']
+                ),
+                json_encode(
+                    ['りんご', 'ばなな', 'みかん']
+                ),
                 json_encode(
                     ['りんご', 'ばなな', 'みかん']
                 ),
@@ -86,10 +94,12 @@ class CreateValidationTest extends \Tests\AbstractTestCase
             '大きな数字' => [
                 -9999999999,
                 99999999999,
+                99999999999,
             ],
             '大きな文字列' => [
-                str_repeat('q', 65),
-                str_repeat('k@', 129),
+                str_repeat('a@', 65),
+                str_repeat('p1', 50),
+                str_repeat('11', 2),
             ],
         ];
     }
@@ -103,8 +113,11 @@ class CreateValidationTest extends \Tests\AbstractTestCase
     public function testEmail($email)
     {
         $jsonResponse = $this->post(
-            "/v1/accounts/999999/emails",
-            ['email' => $email]
+            "/v1/accounts",
+            [
+                'email'    => $email,
+                'password' => 'Password123',
+            ]
         );
 
         $errorCode = 422;
@@ -139,6 +152,7 @@ class CreateValidationTest extends \Tests\AbstractTestCase
     /**
      * パスワードのバリデーションエラー
      *
+     * @dataProvider passwordProvider
      * @param $password
      */
     public function testPassword($password)
@@ -185,13 +199,14 @@ class CreateValidationTest extends \Tests\AbstractTestCase
     /**
      * email_verifiedのバリデーションエラー
      *
+     * @dataProvider emailVerifiedProvider
      * @param $emailVerified
      */
     public function testEmailVerified($emailVerified)
     {
         $email         = 'k-keita@example.com';
         $password      = 'Password1';
-        $emailVerified = 1;
+        $emailVerified = $emailVerified;
 
         $jsonResponse = $this->post(
             "/v1/accounts",
@@ -217,8 +232,8 @@ class CreateValidationTest extends \Tests\AbstractTestCase
         );
 
         $this->assertObjectNotHasAttribute('email', $responseStdObject->errors);
-        $this->assertObjectHasAttribute('password', $responseStdObject->errors);
-        $this->assertObjectNotHasAttribute('email_verified', $responseStdObject->errors);
+        $this->assertObjectNotHasAttribute('password', $responseStdObject->errors);
+        $this->assertObjectHasAttribute('email_verified', $responseStdObject->errors);
     }
 
     /**
@@ -228,6 +243,6 @@ class CreateValidationTest extends \Tests\AbstractTestCase
      */
     public function emailVerifiedProvider()
     {
-        return ValidationProviderCreator::passwordIsRequiredParams();
+        return ValidationProviderCreator::emailVerifiedIsOptionalParams();
     }
 }

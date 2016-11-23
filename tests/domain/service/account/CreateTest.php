@@ -52,29 +52,30 @@ class CreateTest extends \Tests\AbstractTestCase
             ]
         );
 
-        $responseArray = json_decode(
+        $responseObject = json_decode(
             $jsonResponse->response->content()
         );
 
-        $expectedSub   = 1;
-        $accountStatus = 0;
+        $expectedSub         = 2;
+        $accountStatusString = 'enabled';
+        $accountStatusInt    = 0;
 
         $expectedLinks = [
             'self' => [
-                'href' => "/v1/accounts",
+                'href' => "/v1/accounts/$expectedSub",
             ]
         ];
 
         $expectedEmbedded = [
-            '_embedded' => [
-                'email'          => 'keita-nishimoto',
-                'email_verified' => 1,
-            ],
+            'email'          => $email,
+            'email_verified' => 0,
+            'password_hash'  => $responseObject->_embedded->password_hash,
         ];
 
         $jsonResponse
-            ->seeJson(['_links' => $expectedLinks])
             ->seeJson(['sub' => $expectedSub])
+            ->seeJson(['account_status' => $accountStatusString])
+            ->seeJson(['_links' => $expectedLinks])
             ->seeJson(['_embedded' => $expectedEmbedded])
             ->seeStatusCode(201)
             ->seeHeader('X-Request-Id')
@@ -89,7 +90,7 @@ class CreateTest extends \Tests\AbstractTestCase
             'accounts',
             [
                 'id'           => $expectedSub,
-                'status'       => $accountStatus,
+                'status'       => $accountStatusInt,
                 'lock_version' => 0,
             ]
         );
@@ -97,7 +98,7 @@ class CreateTest extends \Tests\AbstractTestCase
         $this->seeInDatabase(
             'accounts_emails',
             [
-                'id'           => $idSequence,
+                'id'           => $idSequence + 1,
                 'account_id'   => $expectedSub,
                 'lock_version' => 0,
             ]
@@ -106,7 +107,7 @@ class CreateTest extends \Tests\AbstractTestCase
         $this->seeInDatabase(
             'accounts_passwords',
             [
-                'id'           => $idSequence,
+                'id'           => $idSequence + 1,
                 'account_id'   => $expectedSub,
                 'lock_version' => 0,
             ]

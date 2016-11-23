@@ -11,6 +11,7 @@
 namespace Domain;
 
 use Exceptions\DomainException;
+use Exceptions\RuntimeException;
 use Exceptions\ValidationException;
 
 /**
@@ -29,13 +30,16 @@ class ValidationService
      * バリデーションを実行する
      * ドメイン層のサービスメソッドの開始時に必ず実行する
      *
-     * @param $serviceName
-     * @param $executeMethod
+     * @param string $serviceName
+     * @param string $executeMethod
      * @param array $params
      * @throws ValidationException
      */
-    public static function doValidate($serviceName, $executeMethod, $params = [])
-    {
+    public static function doValidate(
+        string $serviceName,
+        string $executeMethod,
+        array $params = []
+    ) {
         $validationRules = self::getValidationRules($serviceName, $executeMethod);
 
         $validator = \Validator::make(
@@ -54,16 +58,16 @@ class ValidationService
      *
      * config/validation_attributes.php に定義ファイルがあるのでそこに属性定義を追加する。
      *
-     * @param $attributeKey
-     * @return mixed
-     * @throws DomainException
+     * @param string $attributeKey
+     * @return string
+     * @throws RuntimeException
      * @link https://readouble.com/laravel/5.3/ja/validation.html
      */
-    private static function getValidationAttribute($attributeKey)
+    private static function getValidationAttribute(string $attributeKey): string
     {
         $validationAttribute = \Config::get('validation_attributes.' . $attributeKey);
         if (empty($validationAttribute) === true) {
-            throw new DomainException(10002);
+            throw new RuntimeException(1);
         }
 
         return $validationAttribute;
@@ -75,21 +79,21 @@ class ValidationService
      * config/validation_params.php に定義ファイルがあるのでそこにパラメータ定義を追加する。
      * 対象パラメータが必須かそうでないかを記載する。
      *
-     * 詳しくは@linkのLaravel バリデーションを参照
-     *
-     * @param $serviceName
-     * @param $executeMethod
-     * @return mixed
-     * @throws DomainException
+     * @param string $serviceName
+     * @param string $executeMethod
+     * @return array
+     * @throws RuntimeException
      * @link https://readouble.com/laravel/5.3/ja/validation.html
      */
-    private static function getValidationParams($serviceName, $executeMethod)
-    {
+    private static function getValidationParams(
+        string $serviceName,
+        string $executeMethod
+    ): array {
         $paramsKey = sprintf('validation_params.%s.%s', $serviceName, $executeMethod);
         $validationParams = \Config::get($paramsKey);
 
         if (empty($validationParams) === true) {
-            throw new DomainException(10001);
+            throw new RuntimeException(0);
         }
 
         return $validationParams;
@@ -98,16 +102,18 @@ class ValidationService
     /**
      * バリデーションルールを取得する
      *
-     * @param $serviceName
-     * @param $executeMethod
-     * @return mixed
+     * @param string $serviceName
+     * @param string $executeMethod
+     * @return array
      * @throws DomainException
      * @see getValidationParams
      * @see getValidationAttribute
      * @link https://readouble.com/laravel/5.3/ja/validation.html
      */
-    private static function getValidationRules($serviceName, $executeMethod)
-    {
+    private static function getValidationRules(
+        string $serviceName,
+        string $executeMethod
+    ): array {
         $validationParams = self::getValidationParams($serviceName, $executeMethod);
 
         foreach ($validationParams as $validationParamKey => $validationRule) {

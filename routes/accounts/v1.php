@@ -21,7 +21,7 @@ Route::post(
 /**
  * アカウント登録
  *
- * @link https://dev.laravel-api.net/v1/accounts/{sub}/emails/{email_verify_token}
+ * @link https://dev.laravel-api.net/v1/accounts
  */
 Route::post(
     'accounts',

@@ -9,6 +9,8 @@
 
 namespace Domain\Account;
 
+use Domain\ValueObjectInterface;
+
 /**
  * Class PasswordValue
  *
@@ -18,7 +20,7 @@ namespace Domain\Account;
  * @since 2016-10-05
  * @link https://github.com/keita-nishimoto/laravel-api-sample
  */
-class PasswordValue
+class PasswordValue implements ValueObjectInterface
 {
     /**
      * パスワード
@@ -70,6 +72,23 @@ class PasswordValue
         if (empty($this->getPassword()) === false && empty($this->getPasswordHash()) === true) {
             $this->generatePasswordHash();
         }
+    }
+
+    /**
+     * 自身が空のオブジェクトか判定する
+     *
+     * @return bool
+     */
+    public function isEmpty(): bool
+    {
+        $password     = $this->getPassword();
+        $passwordHash = $this->getPasswordHash();
+
+        if ($password === '' && $passwordHash === '') {
+            return true;
+        }
+
+        return false;
     }
 
     /**

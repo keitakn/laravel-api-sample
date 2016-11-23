@@ -12,6 +12,7 @@ namespace Domain\Account;
 use Domain\User\UserEntity;
 use Factories\Account\EntityFactory;
 use Infrastructures\Utility\StringUtility;
+use Repositories\Mysql\AccountRepository;
 
 /**
  * Class UserSpecification
@@ -28,19 +29,18 @@ class AccountSpecification
     /**
      * アカウントEntityを新規で作成する
      *
-     * @param int $sub
      * @return AccountEntity
      */
-    public static function newAccountEntity(int $sub)
+    public static function newAccountEntity()
     {
-        $accountEntity = EntityFactory::createAccountEntity(
-            $sub
-        );
+        $accountRepository = AccountRepository::getInstance();
 
-        // アカウントステータスは0固定
-        $accountEntity
-            ->setAccountStatus(0)
-            ->setLockVersion(0);
+        $params = [
+            'status'       => 0,
+            'lock_version' => 0,
+        ];
+
+        $accountEntity = $accountRepository->createAccountEntity($params);
 
         return $accountEntity;
     }

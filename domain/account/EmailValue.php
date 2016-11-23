@@ -8,6 +8,7 @@
  */
 
 namespace Domain\Account;
+use Domain\ValueObjectInterface;
 
 /**
  * Class EmailValue
@@ -18,7 +19,7 @@ namespace Domain\Account;
  * @since 2016-09-20
  * @link https://github.com/keita-nishimoto/laravel-api-sample
  */
-class EmailValue
+class EmailValue implements ValueObjectInterface
 {
     /**
      * メールアドレス
@@ -57,8 +58,8 @@ class EmailValue
      * @param int $id
      */
     public function __construct(
-        string $email,
-        int $emailVerified,
+        string $email = '',
+        int $emailVerified = 0,
         int $lockVersion = 0,
         int $id = 0
     ) {
@@ -66,6 +67,20 @@ class EmailValue
             ->setEmailVerified($emailVerified)
             ->setLockVersion($lockVersion)
             ->setId($id);
+    }
+
+    /**
+     * 自身が空のオブジェクトか判定する
+     *
+     * @return bool
+     */
+    public function isEmpty(): bool
+    {
+        if ($this->getEmail() === '') {
+            return true;
+        }
+
+        return false;
     }
 
     /**

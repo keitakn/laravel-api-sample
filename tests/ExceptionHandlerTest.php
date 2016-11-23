@@ -48,8 +48,8 @@ class ExceptionHandlerTest extends \Tests\AbstractTestCase
      */
     public function testFailMethodNotAllowedHttp()
     {
-        $jsonResponse = $this->delete(
-            '/v1/login/password'
+        $jsonResponse = $this->patch(
+            '/v1/accounts'
         );
 
         $errorCode = 405;

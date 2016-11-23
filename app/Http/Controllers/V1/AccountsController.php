@@ -8,8 +8,6 @@
  * @link https://readouble.com/laravel/5.3/ja/controllers.html
  */
 
-// App\Http\Controllers\V1\AccountController
-
 namespace App\Http\Controllers\V1;
 
 use Illuminate\Http\Request;

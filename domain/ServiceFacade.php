@@ -11,6 +11,7 @@
 namespace Domain;
 
 use Exceptions\DomainException;
+use Exceptions\RuntimeException;
 use Exceptions\ValidationException;
 use Factories\EntityFactory;
 use Factories\ServiceFactory;
@@ -146,8 +147,8 @@ class ServiceFacade
 
             // DBのDuplicate entryは特別なエラーコードを返す
             if ($e->getCode() === '23000') {
-                $errorCode    = 409;
-                $messageKey   = 'error_messages' . '.' . $errorCode;
+                $errorCode = 409;
+                $messageKey = 'error_messages' . '.' . $errorCode;
                 $errorMessage = \Config::get($messageKey);
 
                 $responseEntity = EntityFactory::createResponseEntity($requestEntity);
@@ -175,10 +176,28 @@ class ServiceFacade
             Logger::critical($e, $responseEntity);
 
             return $responseEntity;
-        } catch (\Throwable $e) {
+        } catch (RuntimeException $e) {
+            // ここに入る時はアプリケーションの設定に何らかの不備がある
             \DB::rollBack();
 
-            $errorCode = 10000;
+            $errorCode = 10001;
+            $messageKey = 'error_messages' . '.' . $errorCode;
+            $errorMessage = \Config::get($messageKey);
+
+            $responseEntity = EntityFactory::createResponseEntity($requestEntity);
+            $responseEntity
+                ->setErrorCode($errorCode)
+                ->setErrorMessage($errorMessage)
+                ->createErrorResponse();
+
+            Logger::critical($e, $responseEntity);
+
+            return $responseEntity;
+        } catch (\Throwable $e) {
+            // 予期しないエラー、これが発生したらログから原因を特定し問題に対処する
+            \DB::rollBack();
+
+            $errorCode = 500;
             $messageKey = 'error_messages' . '.' . $errorCode;
             $errorMessage = \Config::get($messageKey);
 

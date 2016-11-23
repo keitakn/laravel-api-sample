@@ -91,8 +91,13 @@ class ResponseEntity
     public function __construct(RequestEntity $requestEntity)
     {
         $this->setRequestEntity($requestEntity)
+            ->setHttpStatusCode(200)
+            ->setHeader([])
             ->setOptionalHeader([])
             ->setBody([])
+            ->setApiResponse([])
+            ->setErrorCode(0)
+            ->setErrorMessage('')
             ->setHeader([])
             ->setValidationErrors([]);
     }

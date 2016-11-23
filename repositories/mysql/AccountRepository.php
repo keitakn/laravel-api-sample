@@ -40,7 +40,7 @@ class AccountRepository implements AccountRepositoryInterface
         $instanceKey = 'AccountRepository';
         try {
             $instance = \App::make($instanceKey);
-            if ($instance instanceof \Repositories\Mysql\AccountRepository) {
+            if ($instance instanceof AccountRepository) {
                 return $instance;
             }
         } catch (\ReflectionException $e) {
@@ -52,24 +52,32 @@ class AccountRepository implements AccountRepositoryInterface
     }
 
     /**
-     * アカウントEntityを保存する
+     * アカウントEntityを新規で作成し保存する
      *
-     * @param AccountEntity $accountEntity
+     * @param array $params
      * @return AccountEntity
      * @throws DomainException
      */
-    public function saveAccountEntity(AccountEntity $accountEntity)
+    public function createAccountEntity(array $params): AccountEntity
     {
         $values = [
-            'id'          => $accountEntity->getSub(),
-            'register_id' => $accountEntity->getRegisterId(),
-            'status'      => $accountEntity->getAccountStatus(),
+            'status'       => $params['status'],
+            'lock_version' => $params['lock_version'],
         ];
 
         $result = \DB::table('accounts')->insert($values);
         if ($result === false) {
             throw new DomainException(20000);
         }
+
+        $lastInsertId = \DB::getPdo()->lastInsertId();
+
+        $accountEntity = EntityFactory::createAccountEntity(
+            (int)$lastInsertId
+        );
+
+        $accountEntity->setAccountStatus($values['status'])
+            ->setLockVersion($values['lock_version']);
 
         return $accountEntity;
     }
@@ -102,7 +110,7 @@ class AccountRepository implements AccountRepositoryInterface
             [
                 'email'         => $emailValue->getEmail(),
                 'emailVerified' => $emailValue->isEmailVerified(),
-                'id'            => $emailId,
+                'id'            => (int)$emailId,
             ]
         );
 
@@ -120,12 +128,11 @@ class AccountRepository implements AccountRepositoryInterface
      */
     public function savePassword(AccountEntity $accountEntity): AccountEntity
     {
-        $passwordValue = $accountEntity->getAuthenticationPassword();
+        $passwordValue = $accountEntity->getPasswordValue();
 
         $values = [
             'account_id'    => $accountEntity->getSub(),
             'password_hash' => $passwordValue->getPasswordHash(),
-            'password_type' => $passwordValue->getPasswordType(),
         ];
 
         $result = \DB::table('accounts_passwords')->insert($values);
@@ -246,7 +253,7 @@ class AccountRepository implements AccountRepositoryInterface
             ->first();
 
         if (is_null($account) === true) {
-            return $account;
+            return EntityFactory::createEmptyAccountEntity();
         }
 
         $accountEntity = EntityFactory::createAccountEntity($account->id);
@@ -265,7 +272,6 @@ class AccountRepository implements AccountRepositoryInterface
         $passwordValue = ValueFactory::createPasswordValue(
             [
                 'passwordHash' => $account->password_hash,
-                'lockVersion'  => $account->lock_version,
                 'lockVersion'  => $account->accounts_passwords_lock_version,
                 'id'           => $account->password_id,
             ]
@@ -274,28 +280,5 @@ class AccountRepository implements AccountRepositoryInterface
         $accountEntity->setPasswordValue($passwordValue);
 
         return $accountEntity;
-    }
-
-    /**
-     * ユーザーIDから認証用パスワードを検索する
-     *
-     * @param $sub
-     * @return null|\stdClass
-     */
-    private function findAuthenticationPasswordBySub($sub)
-    {
-        $selectColumns = [
-            'id',
-            'password_hash',
-            'password_type',
-            'lock_version',
-        ];
-
-        $passwords = \DB::table('accounts_passwords')
-            ->select($selectColumns)
-            ->where('account_id', '=', $sub)
-            ->first();
-
-        return $passwords;
     }
 }

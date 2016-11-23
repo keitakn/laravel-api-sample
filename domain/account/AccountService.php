@@ -39,18 +39,34 @@ class AccountService
     {
         $requestParams = $requestEntity->getRequestParams();
 
-        $sub   = $requestParams['sub'];
-        $email = $requestParams['email'];
-
-        $accountRepository = AccountRepository::getInstance();
-        $accountEntity = $accountRepository->findAccountEntity($sub);
+        $email    = $requestParams['email'];
+        $password = $requestParams['password'];
 
         $emailValue = ValueFactory::createEmailValue(
             [
                 'email'         => $email,
-                'emailVerified' => 1,
+                'emailVerified' => 0,
             ]
         );
+
+        if (EmailSpecification::canRegisterableEmail($emailValue) === false) {
+            throw new DomainException(40000);
+        }
+
+        $passwordValue = ValueFactory::createPasswordValue(
+            [
+                'password' => $password,
+            ]
+        );
+
+        $accountEntity = AccountSpecification::newAccountEntity();
+        $accountEntity
+            ->setEmailValue($emailValue)
+            ->setPasswordValue($passwordValue)
+            ->saveEmail()
+            ->savePassword();
+
+        $sub = $accountEntity->getSub();
 
         $locationFormat = '%s/v1/accounts/%s';
         $location = sprintf(
@@ -70,14 +86,14 @@ class AccountService
         ];
 
         $response = [
-            '_links' => [
-                'self' => [
-                    'href' => "/v1/accounts/$sub"
-                ],
-            ],
             'sub'            => $sub,
             'account_status' => $accountEntity->convertAccountStatusToString(),
-            '_embedded'      => $embedded,
+            '_links' => [
+                'self' => [
+                    'href' => "/v1/accounts/$sub",
+                ],
+            ],
+            '_embedded' => $embedded,
         ];
 
         $responseEntity = EntityFactory::createResponseEntity($requestEntity);

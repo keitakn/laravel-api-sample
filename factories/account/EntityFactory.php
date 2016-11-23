@@ -9,6 +9,8 @@
 
 namespace Factories\Account;
 
+use Domain\Account\AccountEntity;
+
 /**
  * Class EntityFactory
  *
@@ -22,17 +24,17 @@ class EntityFactory
 {
 
     /**
-     * ユーザーEntityを生成する
+     * アカウントEntityを生成する
      *
-     * @param $sub
-     * @return \Domain\Account\AccountEntity
+     * @param int $sub
+     * @return AccountEntity
      */
-    public static function createAccountEntity($sub)
+    public static function createAccountEntity(int $sub): AccountEntity
     {
         $instanceKey = 'AccountEntity' . $sub;
         try {
             $accountEntity = \App::make($instanceKey);
-            if ($accountEntity instanceof \Domain\Account\AccountEntity) {
+            if ($accountEntity instanceof AccountEntity) {
                 return $accountEntity;
             }
         } catch (\ReflectionException $e) {
@@ -41,5 +43,17 @@ class EntityFactory
 
             return $accountEntity;
         }
+    }
+
+    /**
+     * 空のアカウントEntityを生成する
+     *
+     * @return AccountEntity
+     */
+    public static function createEmptyAccountEntity(): AccountEntity
+    {
+        $sub = 0;
+
+        return self::createAccountEntity($sub);
     }
 }

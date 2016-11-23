@@ -72,6 +72,18 @@ class Handler extends ExceptionHandler
             );
         }
 
+        if ($exception instanceof \Throwable) {
+            $responseEntity = $this->convertUnexpectedToResponse($request, $exception);
+
+            Logger::critical($exception, $responseEntity);
+
+            return response()->json(
+                $responseEntity->getBody(),
+                $responseEntity->getHttpStatusCode(),
+                $responseEntity->getHeader()
+            );
+        }
+
         return parent::render($request, $exception);
     }
 
@@ -128,6 +140,30 @@ class Handler extends ExceptionHandler
         $requestEntity = $this->createRequestEntity($request);
 
         $domainException = new DomainException(405, $exception);
+
+        $responseEntity = EntityFactory::createResponseEntity($requestEntity);
+        $responseEntity
+            ->setErrorCode($domainException->getErrorCode())
+            ->setErrorMessage($domainException->getErrorMessage())
+            ->createErrorResponse();
+
+        return $responseEntity;
+    }
+
+    /**
+     * 予期せぬエラーの場合のレスポンス
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param Exception $exception
+     * @return \Domain\ResponseEntity
+     */
+    private function convertUnexpectedToResponse(
+        \Illuminate\Http\Request $request,
+        Exception $exception
+    ) {
+        $requestEntity = $this->createRequestEntity($request);
+
+        $domainException = new DomainException(500, $exception);
 
         $responseEntity = EntityFactory::createResponseEntity($requestEntity);
         $responseEntity
