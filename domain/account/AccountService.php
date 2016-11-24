@@ -14,7 +14,6 @@ use Domain\ResponseEntity;
 use Exceptions\DomainException;
 use Factories\Account\ValueFactory;
 use Factories\EntityFactory;
-use Repositories\Mysql\AccountRepository;
 
 /**
  * Class AccountService
