@@ -15,6 +15,30 @@ $ cd /home/vagrant/laravel-api-sample
 $ composer install
 ```
 
+## HTTPクライアントによるアクセス方法
+
+[laravel-vagrant](https://github.com/keita-nishimoto/laravel-vagrant) を利用している前提ですが、それぞれ以下のURLでアクセス可能です。
+
+- APIのベースURL
+    - https://192.168.33.21
+- APIのコードカバレッジ
+    - http://192.168.33.21
+
+これらのURLにはVirtualHostの設定がサーバ側で行われています。
+よって以下のhosts設定をホストOSに行う事で下記のURLでのアクセスも可能になっています。
+
+- APIのベースURL
+    - https://dev.laravel-api.net
+- APIのコードカバレッジ
+    - http://coverage.laravel-api.net
+
+以下はhosts設定です。
+
+```
+192.168.33.21 dev.laravel-api.net
+192.168.33.21 coverage.laravel-api.net
+```
+
 ## IDEでの開発効率を向上させる
 
 _ide_helper.php を生成する事でIDEでのコード補完を可能にします。
@@ -32,12 +56,6 @@ PhpStorm、もしくはIntelliJ IDEA Ultimateを使っている人はIDEの専�
 ※_ide_helper.phpだけでも十分なコード補完が出来るので興味ある人だけ見てください。
 
 （参考）[Laravel IDE補完](http://blog.comnect.jp.net/blog/119)
-
-
-# 参考リンク
-
-- [公式ドキュメント](https://laravel.com/docs/5.3)
-- [日本語ドキュメント](https://readouble.com/laravel/5.3/ja/)
 
 コーディング規約（PSR-2）に違反しているコードをある程度自動整形してくれます。
 ただし変数名の変更等の動作に影響がある場合は自動整形されません。
