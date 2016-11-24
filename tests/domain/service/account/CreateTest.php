@@ -41,7 +41,7 @@ class CreateTest extends \Tests\AbstractTestCase
      */
     public function testSuccessRequiredParams()
     {
-        $email    = 'email-update-apply-test-success-update@gmail.com';
+        $email    = 'account-create-test-success-required-params@gmail.com';
         $password = 'Password1';
 
         $jsonResponse = $this->post(
@@ -98,9 +98,94 @@ class CreateTest extends \Tests\AbstractTestCase
         $this->seeInDatabase(
             'accounts_emails',
             [
+                'id'             => $idSequence + 1,
+                'account_id'     => $expectedSub,
+                'email'          => $email,
+                'email_verified' => 0,
+                'lock_version'   => 0,
+            ]
+        );
+
+        $this->seeInDatabase(
+            'accounts_passwords',
+            [
                 'id'           => $idSequence + 1,
                 'account_id'   => $expectedSub,
                 'lock_version' => 0,
+            ]
+        );
+    }
+
+    /**
+     * 正常系テスト
+     * email_verifiedを1で指定
+     */
+    public function testSuccessEmailVerifiedTrue()
+    {
+        $email         = 'account-create-test-success-email-verified-true@gmail.com';
+        $password      = 'Password1';
+        $emailVerified = 1;
+
+        $jsonResponse = $this->post(
+            "/v1/accounts",
+            [
+                'email'          => $email,
+                'password'       => $password,
+                'email_verified' => $emailVerified
+            ]
+        );
+
+        $responseObject = json_decode(
+            $jsonResponse->response->content()
+        );
+
+        $expectedSub         = 2;
+        $accountStatusString = 'enabled';
+        $accountStatusInt    = 0;
+
+        $expectedLinks = [
+            'self' => [
+                'href' => "/v1/accounts/$expectedSub",
+            ]
+        ];
+
+        $expectedEmbedded = [
+            'email'          => $email,
+            'email_verified' => $emailVerified,
+            'password_hash'  => $responseObject->_embedded->password_hash,
+        ];
+
+        $jsonResponse
+            ->seeJson(['sub' => $expectedSub])
+            ->seeJson(['account_status' => $accountStatusString])
+            ->seeJson(['_links' => $expectedLinks])
+            ->seeJson(['_embedded' => $expectedEmbedded])
+            ->seeStatusCode(201)
+            ->seeHeader('X-Request-Id')
+            ->seeHeader(
+                'location',
+                "https://dev.laravel-api.net/v1/accounts/$expectedSub"
+            );
+
+        $idSequence = 1;
+
+        $this->seeInDatabase(
+            'accounts',
+            [
+                'id'           => $expectedSub,
+                'status'       => $accountStatusInt,
+                'lock_version' => 0,
+            ]
+        );
+
+        $this->seeInDatabase(
+            'accounts_emails',
+            [
+                'id'             => $idSequence + 1,
+                'account_id'     => $expectedSub,
+                'email'          => $email,
+                'email_verified' => $emailVerified,
+                'lock_version'   => 0,
             ]
         );
 

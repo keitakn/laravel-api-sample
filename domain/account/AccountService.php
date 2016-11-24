@@ -38,13 +38,20 @@ class AccountService
     {
         $requestParams = $requestEntity->getRequestParams();
 
-        $email    = $requestParams['email'];
-        $password = $requestParams['password'];
+        $email         = $requestParams['email'];
+        $password      = $requestParams['password'];
+        $emailVerified = 0;
+
+        if (array_key_exists('email_verified', $requestParams) === true) {
+            if ($requestParams['email_verified'] === 1) {
+                $emailVerified = $requestParams['email_verified'];
+            }
+        }
 
         $emailValue = ValueFactory::createEmailValue(
             [
                 'email'         => $email,
-                'emailVerified' => 0,
+                'emailVerified' => $emailVerified,
             ]
         );
 
