@@ -41,9 +41,11 @@ class CreateTest extends \Tests\AbstractTestCase
      */
     public function testSuccessRequiredParams()
     {
+        // リクエストで送信するパラメータを定義
         $email    = 'account-create-test-success-required-params@gmail.com';
         $password = 'Password1';
 
+        // /v1/accountsに対してPOSTリクエストを送信、第2引数はパラメータを配列で渡します。
         $jsonResponse = $this->post(
             "/v1/accounts",
             [
@@ -52,10 +54,12 @@ class CreateTest extends \Tests\AbstractTestCase
             ]
         );
 
+        // APIの結果を一部利用したいのでjson_decode()でstdClassに変換します
         $responseObject = json_decode(
             $jsonResponse->response->content()
         );
 
+        // APIの期待値を設定します。
         $expectedSub         = 2;
         $accountStatusString = 'enabled';
         $accountStatusInt    = 0;
@@ -72,6 +76,7 @@ class CreateTest extends \Tests\AbstractTestCase
             'password_hash'  => $responseObject->_embedded->password_hash,
         ];
 
+        // 実際にJSONResponseの中に自分が期待したデータが入っているか確認します
         $jsonResponse
             ->seeJson(['sub' => $expectedSub])
             ->seeJson(['account_status' => $accountStatusString])
@@ -84,7 +89,16 @@ class CreateTest extends \Tests\AbstractTestCase
                 "https://dev.laravel-api.net/v1/accounts/$expectedSub"
             );
 
-        $idSequence = 1;
+        // パスワードハッシュが意図したロジックで実施されているか確認
+        $this->assertTrue(
+            password_verify(
+                $password,
+                $expectedEmbedded['password_hash']
+            )
+        );
+
+        // DBのテーブルに意図した形でデータが入っているか確認します
+        $idSequence = 2;
 
         $this->seeInDatabase(
             'accounts',
@@ -98,7 +112,7 @@ class CreateTest extends \Tests\AbstractTestCase
         $this->seeInDatabase(
             'accounts_emails',
             [
-                'id'             => $idSequence + 1,
+                'id'             => $idSequence,
                 'account_id'     => $expectedSub,
                 'email'          => $email,
                 'email_verified' => 0,
@@ -109,9 +123,10 @@ class CreateTest extends \Tests\AbstractTestCase
         $this->seeInDatabase(
             'accounts_passwords',
             [
-                'id'           => $idSequence + 1,
-                'account_id'   => $expectedSub,
-                'lock_version' => 0,
+                'id'            => $idSequence,
+                'account_id'    => $expectedSub,
+                'password_hash' => $expectedEmbedded['password_hash'],
+                'lock_version'  => 0,
             ]
         );
     }
@@ -167,7 +182,14 @@ class CreateTest extends \Tests\AbstractTestCase
                 "https://dev.laravel-api.net/v1/accounts/$expectedSub"
             );
 
-        $idSequence = 1;
+        $this->assertTrue(
+            password_verify(
+                $password,
+                $expectedEmbedded['password_hash']
+            )
+        );
+
+        $idSequence = 2;
 
         $this->seeInDatabase(
             'accounts',
@@ -181,7 +203,7 @@ class CreateTest extends \Tests\AbstractTestCase
         $this->seeInDatabase(
             'accounts_emails',
             [
-                'id'             => $idSequence + 1,
+                'id'             => $idSequence,
                 'account_id'     => $expectedSub,
                 'email'          => $email,
                 'email_verified' => $emailVerified,
@@ -192,9 +214,10 @@ class CreateTest extends \Tests\AbstractTestCase
         $this->seeInDatabase(
             'accounts_passwords',
             [
-                'id'           => $idSequence + 1,
-                'account_id'   => $expectedSub,
-                'lock_version' => 0,
+                'id'            => $idSequence,
+                'account_id'    => $expectedSub,
+                'password_hash' => $expectedEmbedded['password_hash'],
+                'lock_version'  => 0,
             ]
         );
     }

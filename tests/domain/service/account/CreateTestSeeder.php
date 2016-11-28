@@ -13,10 +13,10 @@ use Factories\Account\ValueFactory;
 use Illuminate\Database\Seeder;
 
 /**
- * Class EmailUpdateApplyTestSeeder
+ * Class CreateTestSeeder
  *
  * @category laravel-api-sample
- * @package Tests\Domain\Service\Login
+ * @package Tests\Domain\Service\Account
  * @author keita-nishimoto
  * @since 2016-11-07
  * @link https://github.com/keita-nishimoto/laravel-api-sample
