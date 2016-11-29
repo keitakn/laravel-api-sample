@@ -102,6 +102,9 @@ class ValidationProviderCreator
             '101文字以上のパスワード' => [
                 str_repeat('p1', 50) . 'A',
             ],
+            '数値のみのパスワード' => [
+                12345678
+            ],
             '小文字のみのパスワード' => [
                 'password',
             ],
