@@ -99,8 +99,8 @@ class ValidationProviderCreator
                     ['りんご', 'ばなな', 'みかん']
                 )
             ],
-            '大きな文字列' => [
-                str_repeat('p1', 51),
+            '101文字以上のパスワード' => [
+                str_repeat('p1', 50) . 'A',
             ],
             '小文字のみのパスワード' => [
                 'password',
