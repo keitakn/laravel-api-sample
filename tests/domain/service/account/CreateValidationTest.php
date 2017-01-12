@@ -36,7 +36,7 @@ class CreateValidationTest extends \Tests\AbstractTestCase
     public function testAllParams($email, $emailVerified, $password)
     {
         $jsonResponse = $this->post(
-            "/v1/accounts",
+            '/v1/accounts',
             [
                 'email'          => $email,
                 'password'       => $password,
@@ -113,7 +113,7 @@ class CreateValidationTest extends \Tests\AbstractTestCase
     public function testEmail($email)
     {
         $jsonResponse = $this->post(
-            "/v1/accounts",
+            '/v1/accounts',
             [
                 'email'    => $email,
                 'password' => 'Password123',
@@ -160,7 +160,7 @@ class CreateValidationTest extends \Tests\AbstractTestCase
         $email = 'k-keita@example.com';
 
         $jsonResponse = $this->post(
-            "/v1/accounts",
+            '/v1/accounts',
             [
                 'email'    => $email,
                 'password' => $password,
@@ -209,7 +209,7 @@ class CreateValidationTest extends \Tests\AbstractTestCase
         $emailVerified = $emailVerified;
 
         $jsonResponse = $this->post(
-            "/v1/accounts",
+            '/v1/accounts',
             [
                 'email'          => $email,
                 'password'       => $password,

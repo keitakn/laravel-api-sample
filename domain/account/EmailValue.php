@@ -8,6 +8,7 @@
  */
 
 namespace Domain\Account;
+
 use Domain\ValueObjectInterface;
 
 /**

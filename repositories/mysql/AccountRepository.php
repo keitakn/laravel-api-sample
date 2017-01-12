@@ -13,8 +13,6 @@ namespace Repositories\Mysql;
 use Domain\Account\AccountEntity;
 use Domain\Account\AccountRepositoryInterface;
 use Domain\Account\EmailValue;
-use Domain\Account\EmailVerifyTokenEntity;
-use Domain\User\UserEntity;
 use Exceptions\DomainException;
 use Factories\Account\EntityFactory;
 use Factories\Account\ValueFactory;

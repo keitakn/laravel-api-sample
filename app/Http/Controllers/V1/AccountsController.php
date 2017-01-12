@@ -10,10 +10,9 @@
 
 namespace App\Http\Controllers\V1;
 
-use Illuminate\Http\Request;
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Domain;
+use Illuminate\Http\Request;
 
 /**
  * Class AccountsController
