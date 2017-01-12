@@ -9,8 +9,8 @@
 
 namespace Tests\Domain\Service\Account;
 
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Illuminate\Support\Facades\Artisan;
 
 /**
  * Class CreateTest
@@ -47,7 +47,7 @@ class CreateTest extends \Tests\AbstractTestCase
 
         // /v1/accountsに対してPOSTリクエストを送信、第2引数はパラメータを配列で渡します。
         $jsonResponse = $this->post(
-            "/v1/accounts",
+            '/v1/accounts',
             [
                 'email'    => $email,
                 'password' => $password,
@@ -142,7 +142,7 @@ class CreateTest extends \Tests\AbstractTestCase
         $emailVerified = 1;
 
         $jsonResponse = $this->post(
-            "/v1/accounts",
+            '/v1/accounts',
             [
                 'email'          => $email,
                 'password'       => $password,
@@ -232,7 +232,7 @@ class CreateTest extends \Tests\AbstractTestCase
         $password = 'Password1';
 
         $jsonResponse = $this->post(
-            "/v1/accounts",
+            '/v1/accounts',
             [
                 'email'    => $email,
                 'password' => $password,

@@ -9,9 +9,6 @@
 
 namespace Domain\Account;
 
-use Domain\User\UserEntity;
-use Factories\Account\EntityFactory;
-use Infrastructures\Utility\StringUtility;
 use Repositories\Mysql\AccountRepository;
 
 /**
