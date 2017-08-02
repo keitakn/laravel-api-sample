@@ -7,7 +7,7 @@
  * @link https://github.com/keita-nishimoto/laravel-api-sample
  */
 
-namespace Tests\Domain\Service\Account;
+namespace Tests\Feature\Domain\Service\Account;
 
 use Factories\Account\ValueFactory;
 use Illuminate\Database\Seeder;

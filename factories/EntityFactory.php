@@ -11,6 +11,10 @@
 
 namespace Factories;
 
+use Domain\RequestEntity;
+use Domain\ResponseEntity;
+use Illuminate\Http\Request;
+
 /**
  * Class EntityFactory
  *
@@ -22,6 +26,12 @@ namespace Factories;
  */
 class EntityFactory
 {
+    /**
+     * インスタンス格納用の変数
+     *
+     * @var array
+     */
+    private static $instancePool = [];
 
     /**
      * RequestEntityを生成する
@@ -31,20 +41,17 @@ class EntityFactory
      * @param array $urlParams
      * @return \Domain\RequestEntity
      */
-    public static function createRequestEntity($XRequestId, \Illuminate\Http\Request $request, $urlParams = [])
+    public static function createRequestEntity($XRequestId, Request $request, $urlParams = [])
     {
         $instanceKey = 'RequestEntity' . $XRequestId;
-        try {
-            $requestEntity = \App::make($instanceKey);
-            if ($requestEntity instanceof \Domain\RequestEntity) {
-                return $requestEntity;
+        if (array_key_exists($instanceKey, self::$instancePool)) {
+            if (self::$instancePool[$instanceKey] instanceof RequestEntity) {
+                return self::$instancePool[$instanceKey];
             }
-        } catch (\ReflectionException $e) {
-            \App::singleton($instanceKey, '\Domain\RequestEntity');
-            $requestEntity = \App::make($instanceKey, [$XRequestId, $request, $urlParams]);
-
-            return $requestEntity;
         }
+
+        self::$instancePool[$instanceKey] = new RequestEntity($XRequestId, $request, $urlParams);
+        return self::$instancePool[$instanceKey];
     }
 
     /**
@@ -53,19 +60,16 @@ class EntityFactory
      * @param \Domain\RequestEntity $requestEntity
      * @return \Domain\ResponseEntity
      */
-    public static function createResponseEntity(\Domain\RequestEntity $requestEntity)
+    public static function createResponseEntity(RequestEntity $requestEntity)
     {
         $instanceKey = 'ResponseEntity' . $requestEntity->getXRequestId();
-        try {
-            $responseEntity = \App::make($instanceKey);
-            if ($responseEntity instanceof \Domain\ResponseEntity) {
-                return $responseEntity;
+        if (array_key_exists($instanceKey, self::$instancePool)) {
+            if (self::$instancePool[$instanceKey] instanceof ResponseEntity) {
+                return self::$instancePool[$instanceKey];
             }
-        } catch (\ReflectionException $e) {
-            \App::singleton($instanceKey, '\Domain\ResponseEntity');
-            $responseEntity = \App::make($instanceKey, [$requestEntity]);
-
-            return $responseEntity;
         }
+
+        self::$instancePool[$instanceKey] = new ResponseEntity($requestEntity);
+        return self::$instancePool[$instanceKey];
     }
 }

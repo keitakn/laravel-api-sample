@@ -7,9 +7,10 @@
  * @link https://github.com/keita-nishimoto/laravel-api-sample
  */
 
-namespace Tests\Domain\Service\Account;
+namespace Tests\Feature\Domain\Service\Account;
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Tests\AbstractTestCase;
 use Tests\ValidationProviderCreator;
 
 /**
@@ -21,7 +22,7 @@ use Tests\ValidationProviderCreator;
  * @since 2016-11-17
  * @link https://github.com/keita-nishimoto/laravel-api-sample
  */
-class CreateValidationTest extends \Tests\AbstractTestCase
+class CreateValidationTest extends AbstractTestCase
 {
     use WithoutMiddleware;
 
@@ -35,7 +36,7 @@ class CreateValidationTest extends \Tests\AbstractTestCase
      */
     public function testAllParams($email, $emailVerified, $password)
     {
-        $jsonResponse = $this->post(
+        $testResponse = $this->post(
             '/v1/accounts',
             [
                 'email'          => $email,
@@ -48,18 +49,16 @@ class CreateValidationTest extends \Tests\AbstractTestCase
         $messageKey = 'error_messages' . '.' . $errorCode;
         $errorMessage = \Config::get($messageKey);
 
-        $jsonResponse
-            ->seeJson(['code' => $errorCode])
-            ->seeJson(['message' => $errorMessage])
-            ->seeStatusCode(422)
-            ->seeHeader('X-Request-Id');
+        $testResponse
+            ->assertJson(['code' => $errorCode])
+            ->assertJson(['message' => $errorMessage])
+            ->assertStatus(422)
+            ->assertHeader('X-Request-Id');
 
-        $responseStdObject = json_decode(
-            $jsonResponse->response->content()
-        );
+        $responseArray = $testResponse->json();
 
-        $this->assertObjectHasAttribute('email', $responseStdObject->errors);
-        $this->assertObjectHasAttribute('email_verified', $responseStdObject->errors);
+        $this->assertArrayHasKey('email', $responseArray['errors']);
+        $this->assertArrayHasKey('email_verified', $responseArray['errors']);
     }
 
     /**
@@ -112,7 +111,7 @@ class CreateValidationTest extends \Tests\AbstractTestCase
      */
     public function testEmail($email)
     {
-        $jsonResponse = $this->post(
+        $testResponse = $this->post(
             '/v1/accounts',
             [
                 'email'    => $email,
@@ -124,19 +123,17 @@ class CreateValidationTest extends \Tests\AbstractTestCase
         $messageKey = 'error_messages' . '.' . $errorCode;
         $errorMessage = \Config::get($messageKey);
 
-        $jsonResponse
-            ->seeJson(['code' => $errorCode])
-            ->seeJson(['message' => $errorMessage])
-            ->seeStatusCode(422)
-            ->seeHeader('X-Request-Id');
+        $testResponse
+            ->assertJson(['code' => $errorCode])
+            ->assertJson(['message' => $errorMessage])
+            ->assertStatus(422)
+            ->assertHeader('X-Request-Id');
 
-        $responseStdObject = json_decode(
-            $jsonResponse->response->content()
-        );
+        $responseArray = $testResponse->json();
 
-        $this->assertObjectHasAttribute('email', $responseStdObject->errors);
-        $this->assertObjectNotHasAttribute('password', $responseStdObject->errors);
-        $this->assertObjectNotHasAttribute('email_verified', $responseStdObject->errors);
+        $this->assertArrayHasKey('email', $responseArray['errors']);
+        $this->assertArrayNotHasKey('password', $responseArray['errors']);
+        $this->assertArrayNotHasKey('email_verified', $responseArray['errors']);
     }
 
     /**
@@ -159,7 +156,7 @@ class CreateValidationTest extends \Tests\AbstractTestCase
     {
         $email = 'k-keita@example.com';
 
-        $jsonResponse = $this->post(
+        $testResponse = $this->post(
             '/v1/accounts',
             [
                 'email'    => $email,
@@ -171,19 +168,17 @@ class CreateValidationTest extends \Tests\AbstractTestCase
         $messageKey = 'error_messages' . '.' . $errorCode;
         $errorMessage = \Config::get($messageKey);
 
-        $jsonResponse
-            ->seeJson(['code' => $errorCode])
-            ->seeJson(['message' => $errorMessage])
-            ->seeStatusCode(422)
-            ->seeHeader('X-Request-Id');
+        $testResponse
+            ->assertJson(['code' => $errorCode])
+            ->assertJson(['message' => $errorMessage])
+            ->assertStatus(422)
+            ->assertHeader('X-Request-Id');
 
-        $responseStdObject = json_decode(
-            $jsonResponse->response->content()
-        );
+        $responseArray = $testResponse->json();
 
-        $this->assertObjectNotHasAttribute('email', $responseStdObject->errors);
-        $this->assertObjectHasAttribute('password', $responseStdObject->errors);
-        $this->assertObjectNotHasAttribute('email_verified', $responseStdObject->errors);
+        $this->assertArrayNotHasKey('email', $responseArray['errors']);
+        $this->assertArrayHasKey('password', $responseArray['errors']);
+        $this->assertArrayNotHasKey('email_verified', $responseArray['errors']);
     }
 
     /**
@@ -206,9 +201,8 @@ class CreateValidationTest extends \Tests\AbstractTestCase
     {
         $email         = 'k-keita@example.com';
         $password      = 'Password1';
-        $emailVerified = $emailVerified;
 
-        $jsonResponse = $this->post(
+        $testResponse = $this->post(
             '/v1/accounts',
             [
                 'email'          => $email,
@@ -221,19 +215,17 @@ class CreateValidationTest extends \Tests\AbstractTestCase
         $messageKey = 'error_messages' . '.' . $errorCode;
         $errorMessage = \Config::get($messageKey);
 
-        $jsonResponse
-            ->seeJson(['code' => $errorCode])
-            ->seeJson(['message' => $errorMessage])
-            ->seeStatusCode(422)
-            ->seeHeader('X-Request-Id');
+        $testResponse
+            ->assertJson(['code' => $errorCode])
+            ->assertJson(['message' => $errorMessage])
+            ->assertStatus(422)
+            ->assertHeader('X-Request-Id');
 
-        $responseStdObject = json_decode(
-            $jsonResponse->response->content()
-        );
+        $responseArray = $testResponse->json();
 
-        $this->assertObjectNotHasAttribute('email', $responseStdObject->errors);
-        $this->assertObjectNotHasAttribute('password', $responseStdObject->errors);
-        $this->assertObjectHasAttribute('email_verified', $responseStdObject->errors);
+        $this->assertArrayNotHasKey('email', $responseArray['errors']);
+        $this->assertArrayNotHasKey('password', $responseArray['errors']);
+        $this->assertArrayHasKey('email_verified', $responseArray['errors']);
     }
 
     /**
