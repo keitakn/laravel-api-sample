@@ -36,10 +36,10 @@ class ExceptionHandlerTest extends \Tests\AbstractTestCase
         $errorMessage = \Config::get($messageKey);
 
         $jsonResponse
-            ->seeJson(['code' => $errorCode])
-            ->seeJson(['message' => $errorMessage])
-            ->seeStatusCode(404)
-            ->seeHeader('X-Request-Id');
+            ->assertJson(['code' => $errorCode])
+            ->assertJson(['message' => $errorMessage])
+            ->assertStatus(404)
+            ->assertHeader('X-Request-Id');
     }
 
     /**
@@ -57,9 +57,9 @@ class ExceptionHandlerTest extends \Tests\AbstractTestCase
         $errorMessage = \Config::get($messageKey);
 
         $jsonResponse
-            ->seeJson(['code' => $errorCode])
-            ->seeJson(['message' => $errorMessage])
-            ->seeStatusCode(405)
-            ->seeHeader('X-Request-Id');
+            ->assertJson(['code' => $errorCode])
+            ->assertJson(['message' => $errorMessage])
+            ->assertStatus(405)
+            ->assertHeader('X-Request-Id');
     }
 }

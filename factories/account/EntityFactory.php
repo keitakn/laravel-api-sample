@@ -22,6 +22,12 @@ use Domain\Account\AccountEntity;
  */
 class EntityFactory
 {
+    /**
+     * インスタンス格納用の変数
+     *
+     * @var array
+     */
+    private static $instancePool = [];
 
     /**
      * アカウントEntityを生成する
@@ -32,17 +38,14 @@ class EntityFactory
     public static function createAccountEntity(int $sub): AccountEntity
     {
         $instanceKey = 'AccountEntity' . $sub;
-        try {
-            $accountEntity = \App::make($instanceKey);
-            if ($accountEntity instanceof AccountEntity) {
-                return $accountEntity;
+        if (array_key_exists($instanceKey, self::$instancePool)) {
+            if (self::$instancePool[$instanceKey] instanceof AccountEntity) {
+                return self::$instancePool[$instanceKey];
             }
-        } catch (\ReflectionException $e) {
-            \App::singleton($instanceKey, '\Domain\Account\AccountEntity');
-            $accountEntity = \App::make($instanceKey, [$sub]);
-
-            return $accountEntity;
         }
+
+        self::$instancePool[$instanceKey] = new AccountEntity($sub);
+        return self::$instancePool[$instanceKey];
     }
 
     /**

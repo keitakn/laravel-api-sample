@@ -9,7 +9,7 @@
 
 namespace Tests;
 
-use App\Console\Kernel;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 /**
  * Class AbstractTestCase
@@ -20,8 +20,10 @@ use App\Console\Kernel;
  * @since 2016-09-08
  * @link https://github.com/keita-nishimoto/laravel-api-sample
  */
-abstract class AbstractTestCase extends \Illuminate\Foundation\Testing\TestCase
+abstract class AbstractTestCase extends BaseTestCase
 {
+    use CreatesApplication;
+
     /**
      * The base URL to use while testing the application.
      *
@@ -29,19 +31,6 @@ abstract class AbstractTestCase extends \Illuminate\Foundation\Testing\TestCase
      */
     protected $baseUrl = 'https://dev.laravel-api.net';
 
-    /**
-     * Creates the application.
-     *
-     * @return \Illuminate\Foundation\Application
-     */
-    public function createApplication()
-    {
-        $app = require __DIR__.'/../bootstrap/app.php';
-
-        $app->make(Kernel::class)->bootstrap();
-
-        return $app;
-    }
 
     /**
      * Clean up the testing environment before the next test.

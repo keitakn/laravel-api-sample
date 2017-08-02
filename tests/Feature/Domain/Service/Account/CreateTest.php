@@ -7,10 +7,11 @@
  * @link https://github.com/keita-nishimoto/laravel-api-sample
  */
 
-namespace Tests\Domain\Service\Account;
+namespace Tests\Feature\Domain\Service\Account;
 
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Support\Facades\Artisan;
+use Tests\AbstractTestCase;
 
 /**
  * Class CreateTest
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\Artisan;
  * @since 2016-11-07
  * @link https://github.com/keita-nishimoto/laravel-api-sample
  */
-class CreateTest extends \Tests\AbstractTestCase
+class CreateTest extends AbstractTestCase
 {
     use WithoutMiddleware;
 
@@ -32,7 +33,7 @@ class CreateTest extends \Tests\AbstractTestCase
     public function setUp()
     {
         parent::setUp();
-        Artisan::call('db:seed', ['--class' => 'Tests\Domain\Service\Account\CreateTestSeeder']);
+        Artisan::call('db:seed', ['--class' => 'Tests\Feature\Domain\Service\Account\CreateTestSeeder']);
     }
 
     /**
@@ -46,7 +47,7 @@ class CreateTest extends \Tests\AbstractTestCase
         $password = 'Password1';
 
         // /v1/accountsに対してPOSTリクエストを送信、第2引数はパラメータを配列で渡します。
-        $jsonResponse = $this->post(
+        $testResponse = $this->post(
             '/v1/accounts',
             [
                 'email'    => $email,
@@ -54,10 +55,8 @@ class CreateTest extends \Tests\AbstractTestCase
             ]
         );
 
-        // APIの結果を一部利用したいのでjson_decode()でstdClassに変換します
-        $responseObject = json_decode(
-            $jsonResponse->response->content()
-        );
+        // APIの結果を一部利用したいのでjson_decode()でarrayに変換します
+        $responseArray = $testResponse->json();
 
         // APIの期待値を設定します。
         $expectedSub         = 2;
@@ -73,18 +72,18 @@ class CreateTest extends \Tests\AbstractTestCase
         $expectedEmbedded = [
             'email'          => $email,
             'email_verified' => 0,
-            'password_hash'  => $responseObject->_embedded->password_hash,
+            'password_hash'  => $responseArray['_embedded']['password_hash'],
         ];
 
         // 実際にJSONResponseの中に自分が期待したデータが入っているか確認します
-        $jsonResponse
-            ->seeJson(['sub' => $expectedSub])
-            ->seeJson(['account_status' => $accountStatusString])
-            ->seeJson(['_links' => $expectedLinks])
-            ->seeJson(['_embedded' => $expectedEmbedded])
-            ->seeStatusCode(201)
-            ->seeHeader('X-Request-Id')
-            ->seeHeader(
+        $testResponse
+            ->assertJson(['sub' => $expectedSub])
+            ->assertJson(['account_status' => $accountStatusString])
+            ->assertJson(['_links' => $expectedLinks])
+            ->assertJson(['_embedded' => $expectedEmbedded])
+            ->assertStatus(201)
+            ->assertHeader('X-Request-Id')
+            ->assertHeader(
                 'location',
                 "https://dev.laravel-api.net/v1/accounts/$expectedSub"
             );
@@ -100,7 +99,7 @@ class CreateTest extends \Tests\AbstractTestCase
         // DBのテーブルに意図した形でデータが入っているか確認します
         $idSequence = 2;
 
-        $this->seeInDatabase(
+        $this->assertDatabaseHas(
             'accounts',
             [
                 'id'           => $expectedSub,
@@ -109,7 +108,7 @@ class CreateTest extends \Tests\AbstractTestCase
             ]
         );
 
-        $this->seeInDatabase(
+        $this->assertDatabaseHas(
             'accounts_emails',
             [
                 'id'             => $idSequence,
@@ -120,7 +119,7 @@ class CreateTest extends \Tests\AbstractTestCase
             ]
         );
 
-        $this->seeInDatabase(
+        $this->assertDatabaseHas(
             'accounts_passwords',
             [
                 'id'            => $idSequence,
@@ -141,7 +140,7 @@ class CreateTest extends \Tests\AbstractTestCase
         $password      = 'Password1';
         $emailVerified = 1;
 
-        $jsonResponse = $this->post(
+        $testResponse = $this->post(
             '/v1/accounts',
             [
                 'email'          => $email,
@@ -150,9 +149,8 @@ class CreateTest extends \Tests\AbstractTestCase
             ]
         );
 
-        $responseObject = json_decode(
-            $jsonResponse->response->content()
-        );
+        // APIの結果を一部利用したいのでjson_decode()でarrayに変換します
+        $responseArray = $testResponse->json();
 
         $expectedSub         = 2;
         $accountStatusString = 'enabled';
@@ -167,17 +165,17 @@ class CreateTest extends \Tests\AbstractTestCase
         $expectedEmbedded = [
             'email'          => $email,
             'email_verified' => $emailVerified,
-            'password_hash'  => $responseObject->_embedded->password_hash,
+            'password_hash'  => $responseArray['_embedded']['password_hash'],
         ];
 
-        $jsonResponse
-            ->seeJson(['sub' => $expectedSub])
-            ->seeJson(['account_status' => $accountStatusString])
-            ->seeJson(['_links' => $expectedLinks])
-            ->seeJson(['_embedded' => $expectedEmbedded])
-            ->seeStatusCode(201)
-            ->seeHeader('X-Request-Id')
-            ->seeHeader(
+        $testResponse
+            ->assertJson(['sub' => $expectedSub])
+            ->assertJson(['account_status' => $accountStatusString])
+            ->assertJson(['_links' => $expectedLinks])
+            ->assertJson(['_embedded' => $expectedEmbedded])
+            ->assertStatus(201)
+            ->assertHeader('X-Request-Id')
+            ->assertHeader(
                 'location',
                 "https://dev.laravel-api.net/v1/accounts/$expectedSub"
             );
@@ -191,7 +189,7 @@ class CreateTest extends \Tests\AbstractTestCase
 
         $idSequence = 2;
 
-        $this->seeInDatabase(
+        $this->assertDatabaseHas(
             'accounts',
             [
                 'id'           => $expectedSub,
@@ -200,7 +198,7 @@ class CreateTest extends \Tests\AbstractTestCase
             ]
         );
 
-        $this->seeInDatabase(
+        $this->assertDatabaseHas(
             'accounts_emails',
             [
                 'id'             => $idSequence,
@@ -211,7 +209,7 @@ class CreateTest extends \Tests\AbstractTestCase
             ]
         );
 
-        $this->seeInDatabase(
+        $this->assertDatabaseHas(
             'accounts_passwords',
             [
                 'id'            => $idSequence,
@@ -244,9 +242,9 @@ class CreateTest extends \Tests\AbstractTestCase
         $errorMessage = \Config::get($messageKey);
 
         $jsonResponse
-            ->seeJson(['code' => $errorCode])
-            ->seeJson(['message' => $errorMessage])
-            ->seeStatusCode(409)
-            ->seeHeader('X-Request-Id');
+            ->assertJson(['code' => $errorCode])
+            ->assertJson(['message' => $errorMessage])
+            ->assertStatus(409)
+            ->assertHeader('X-Request-Id');
     }
 }
