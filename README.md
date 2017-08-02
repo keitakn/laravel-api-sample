@@ -20,9 +20,9 @@ $ composer install
 [laravel-vagrant](https://github.com/keita-nishimoto/laravel-vagrant) を利用している前提ですが、それぞれ以下のURLでアクセス可能です。
 
 - APIのベースURL
-    - https://192.168.33.21
+    - https://192.168.34.21
 - APIのコードカバレッジ
-    - http://192.168.33.21
+    - http://192.168.34.21
 
 これらのURLにはVirtualHostの設定がサーバ側で行われています。
 よって以下のhosts設定をホストOSに行う事で下記のURLでのアクセスも可能になっています。
@@ -35,8 +35,8 @@ $ composer install
 以下はhosts設定です。
 
 ```
-192.168.33.21 dev.laravel-api.net
-192.168.33.21 coverage.laravel-api.net
+192.168.34.21 dev.laravel-api.net
+192.168.34.21 coverage.laravel-api.net
 ```
 
 ## IDEでの開発効率を向上させる
