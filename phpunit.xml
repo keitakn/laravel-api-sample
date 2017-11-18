@@ -30,17 +30,11 @@
         <env name="QUEUE_DRIVER" value="sync"/>
     </php>
     <logging>
-        <!--
-        <log
-                type="coverage-html"
-                target="/usr/share/nginx/coverage"
-                title="Base32"
-                charset="UTF-8"
-                yui="true"
-                highlight="true"
-                lowUpperBound="35"
-                highLowerBound="70"
-        />
-        -->
+        <!--<log-->
+            <!--type="coverage-html"-->
+            <!--target="/usr/share/nginx/coverage/laravel-api-sample"-->
+            <!--title="Base32"-->
+            <!--charset="UTF-8"-->
+        <!--/>-->
     </logging>
 </phpunit>
