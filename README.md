@@ -15,6 +15,20 @@ $ cd /home/vagrant/laravel-api-sample
 $ composer install
 ```
 
+## Migrationの実行
+
+プロジェクトルートで以下のcommandを実行して下さい。
+
+```bash
+php artisan migrate
+```
+
+```bash
+php artisan --env=testing migrate
+```
+
+※ `--env=testing` を付けて実行しているのはテスト用のDBに対してMigrationの実行を行う為です。
+
 ## HTTPクライアントによるアクセス方法
 
 [laravel-vagrant](https://github.com/keita-nishimoto/laravel-vagrant) を利用している前提ですが、それぞれ以下のURLでアクセス可能です。
